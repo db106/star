@@ -5,7 +5,8 @@ import random
 import requests
 from pyquery import PyQuery as pq
 import datetime
-
+#import Spades_Team.database.db_mongodb_docker as db_mongodb_docker
+import db_mongodb_docker
 
 
 
@@ -21,7 +22,7 @@ def main(each_region, each_target): #主程式  # 爬蟲 for Instagram
 
 
     global path_dir
-    path_dir = '/data'
+    path_dir = '/rawdata'
     path_dir = path_dir +'/%s' % (search_tag)
     make_dir(path_dir)
 
@@ -54,6 +55,7 @@ def get_html(url): # 訪問網頁
             return response.text
         else:
             print('請求網頁源代碼錯誤, 錯誤狀態碼：', response.status_code)
+            print(url)
             raise
     except Exception as e:
         print(e)
@@ -192,9 +194,15 @@ def get_data(html,each_region,each_target):
         # os.mkdir(path_dir_each)
         # 存文字檔
         with open(path_dir + '/' + title + '.txt', 'a', encoding='utf8') as f:
-            f.write(save_data_js + '\n')
-            f.write('-----\n')
+            f.write(save_data_js + '\n-----\n')
 
+        ## (選配)邊爬邊存mongo
+        # if each_target == '景點':
+        #     db_mongodb_docker.connect_mongodb("spades", "place")
+        # elif each_target == '美食':
+        #     db_mongodb_docker.connect_mongodb("spades", "food")
+        #
+        # db_mongodb_docker.mongodb_insert(json.loads(save_data_js))
 
         # #存照片
         # items = doc('link[rel="image_src"]').items()

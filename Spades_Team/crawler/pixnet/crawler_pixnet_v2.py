@@ -62,6 +62,7 @@ def get_html(url): # 訪問網頁
             return response.text
         else:
             print('請求網頁源代碼錯誤, 錯誤狀態碼：', response.status_code)
+            print(url)
             raise
     except Exception as e:
         print(e)
@@ -200,8 +201,7 @@ def get_data(html,each_region,each_target):
         # os.mkdir(path_dir_each)
         # 存文字檔
         with open(path_dir + '/' + title + '.txt', 'a', encoding='utf8') as f:
-            f.write(save_data_js + '\n')
-            f.write('-----\n')
+            f.write(save_data_js + '\n-----\n')
 
 
         # #存照片
