@@ -1,0 +1,28 @@
+{% extends "mybase.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}上傳照片{% endblock %}
+
+{% block page_content %}
+
+
+<div class="container">
+  <h2>請確認上傳照片~~~</h2>
+    <a href="/travel_plan" class="btn btn-primary" role="button">              確              認              </a>
+    <br>
+    <br>
+
+{% for name in filenames %}
+    <img src="{{ url_for('static', filename= name ) }}" class="float-left" alt="Paris" width="304" height="236">
+
+{% endfor %}
+
+
+
+</div>
+
+
+
+
+
+{% endblock %}
