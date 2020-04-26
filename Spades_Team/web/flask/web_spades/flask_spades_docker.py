@@ -13,7 +13,7 @@ import os
 
 
 app = Flask(__name__) #建立 Flask 物件
-# app.config['UPLOAD_FOLDER'] = upload_dir # user 上傳照片的存檔路徑
+# app.config['UPLOAD_FOLDER'] = upload_dir # user_test 上傳照片的存檔路徑
 # app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
 bootstrap = Bootstrap(app)   #建立 bootstrap 物件
@@ -40,9 +40,9 @@ def load_pic():
     return render_template('index.html')
 
 
-@app.route('/upload',methods=['GET','POST'])
+@app.route('/upload_place',methods=['GET','POST'])
 def action_load_pic():
-    # user 上傳照片的存檔路徑
+    # user_test 上傳照片的存檔路徑
     upload_dir = r'/code/flask/web_spades/static'
 
     if request.method == 'POST':
