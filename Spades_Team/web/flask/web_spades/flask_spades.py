@@ -1,7 +1,7 @@
 # pip install flask
 # pip3 install flask-bootstrap
 # pip3 install flask-bootstrap4
-# pip install flask-wtf Flask-SQLAlchemy
+
 
 import time
 from flask import Flask, render_template, request
@@ -9,7 +9,8 @@ from flask import Flask, render_template, request
 from flask_bootstrap import Bootstrap
 
 
-from Spades_Team.deep_learning.CNN_spades import load_CNN_model
+# docker
+from Spades_Team.spades_teamer_code.transfer_learning_spades import load_transfer_model
 from Spades_Team.spades_teamer_code.VGG16_spades import predict
 from Spades_Team.spades_teamer_code.spades_recommend import place_recommend ,food_recommend
 from Spades_Team.spades_teamer_code.route_plan import main as route_plan
@@ -47,6 +48,8 @@ def load_pic():
 @app.route('/upload',methods=['GET','POST'])
 def action_load_pic():
     global filenames, upload_dir,place_filenames,food_filenames
+
+    # docker
     # user_test 上傳照片的存檔路徑
     upload_dir = r'E:\資策會-DB106\Python\PycharmProjects\Spades\Spades_Team\web\flask\web_spades'
 
@@ -78,8 +81,8 @@ def action_load_pic():
 @app.route('/travel_plan',methods=['GET','POST'])
 def travel_plan():
     time_start = time.time()
-
-    pred_place_dict = load_CNN_model(model_path="E:/資策會-DB106/Python/PycharmProjects/Spades/Spades_Team/deep_learning/CnnModelTrainPlace_v0.6.h5",pic_dir_path= upload_dir + "/static",pic_list=place_filenames)
+    # docker
+    pred_place_dict = load_transfer_model(model_path=r"E:\資策會-DB106\Python\PycharmProjects\Spades\Spades_Team\spades_teamer_code/mode_iv3LeafFinetune_15.h5",pic_dir_path= upload_dir + "/static",pic_list=place_filenames)
     pred_food_dict = predict(pic_dir_path= upload_dir + "/static",pic_list=food_filenames)
     # print('pred_place_dict ', pred_place_dict)
     # print('pred_food_dict ', pred_food_dict)
@@ -99,14 +102,14 @@ def travel_plan():
     '''
     start_place_list = ['台北車站']
     final_list , travel_suggest = route_plan(start_place_list+place_recommend_list+food_recommend_list)
-    print(final_list)
-    print(travel_suggest)
+    print('行程規劃',final_list)
+    print('旅遊建議',travel_suggest)
 
     weather_dict = weather()
-    print(weather_dict)
+    print('天氣',weather_dict)
 
     cost_time = time.time() - time_start
-    print(cost_time,'秒')
+    print('計算花了',cost_time,'秒')
 
     return render_template('index.html' )
 
