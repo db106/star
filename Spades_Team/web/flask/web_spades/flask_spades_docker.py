@@ -1,15 +1,22 @@
 # pip install flask
 # pip3 install flask-bootstrap
 # pip3 install flask-bootstrap4
-# pip install flask-wtf Flask-SQLAlchemy
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for,send_from_directory
+
+import time
+from flask import Flask, render_template, request
 
 from flask_bootstrap import Bootstrap
 
-import os
 
-
+# docker
+import sys
+sys.path.append('/code')
+from transfer_learning_spades import load_transfer_model
+from VGG16_spades import predict
+from spades_recommend import place_recommend ,food_recommend
+from route_plan import main as route_plan
+from weather import weather
 
 
 app = Flask(__name__) #建立 Flask 物件
@@ -40,26 +47,76 @@ def load_pic():
     return render_template('index.html')
 
 
-@app.route('/upload_place',methods=['GET','POST'])
+@app.route('/upload',methods=['GET','POST'])
 def action_load_pic():
+    global filenames, upload_dir,place_filenames,food_filenames
+
+    # docker
     # user_test 上傳照片的存檔路徑
-    upload_dir = r'/code/flask/web_spades/static'
+    upload_dir = r'/code/flask/web_spades'
 
     if request.method == 'POST':
-        uploaded_files = request.files.getlist("file[]")
-        global filenames
+        uploaded_place_files = request.files.getlist("place")
+        uploaded_food_files = request.files.getlist("food")
         filenames = []
+        place_filenames = []
+        food_filenames = []
 
-        for file in uploaded_files:
-
+        for file in uploaded_place_files:
             filename = file.filename
-            file.save(upload_dir+"/"+filename)
+            file.save(upload_dir + "/static/" + filename)
+            place_filenames.append(filename)
             filenames.append(filename)
+
+        for file in uploaded_food_files:
+            filename = file.filename
+            file.save(upload_dir + "/static/" + filename)
+            food_filenames.append(filename)
+            filenames.append(filename)
+
+
 
     print('filenames',filenames)
     return render_template('confirm.html',filenames=filenames)
 
 
+@app.route('/travel_plan',methods=['GET','POST'])
+def travel_plan():
+    time_start = time.time()
+    # docker
+    pred_place_dict = load_transfer_model(model_path=r"/code/mode_iv3LeafFinetune_15.h5",pic_dir_path= upload_dir + "/static",pic_list=place_filenames)
+    pred_food_dict = predict(pic_dir_path= upload_dir + "/static",pic_list=food_filenames)
+    # print('pred_place_dict ', pred_place_dict)
+    # print('pred_food_dict ', pred_food_dict)
+
+
+    '''
+    照片分析完成 進 類別推薦 模型 程式撰寫區
+    '''
+
+    place_recommend_list = place_recommend(pred_place_dict)
+    food_recommend_list = food_recommend(pred_food_dict)
+    print('place_recommend_list ', place_recommend_list)
+    print('food_recommend_list ', food_recommend_list)
+
+    '''
+    得到 地點 進 路線規劃 模型 程式撰寫區
+    '''
+    start_place_list = ['台北車站']
+    final_list , travel_suggest = route_plan(start_place_list+place_recommend_list+food_recommend_list,True)
+    print('行程規劃',final_list)
+    print('旅遊建議',travel_suggest)
+
+    weather_dict = weather()
+    print('天氣',weather_dict)
+
+    cost_time = time.time() - time_start
+    print('計算花了',cost_time,'秒')
+
+    return render_template('index.html' )
+
+
+#============================================================================================
 
 
 

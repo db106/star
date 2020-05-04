@@ -84,14 +84,13 @@ def travel_plan():
     # docker
     pred_place_dict = load_transfer_model(model_path=r"E:\資策會-DB106\Python\PycharmProjects\Spades\Spades_Team\spades_teamer_code/mode_iv3LeafFinetune_15.h5",pic_dir_path= upload_dir + "/static",pic_list=place_filenames)
     pred_food_dict = predict(pic_dir_path= upload_dir + "/static",pic_list=food_filenames)
-    # print('pred_place_dict ', pred_place_dict)
-    # print('pred_food_dict ', pred_food_dict)
+    print('pred_place_dict ', pred_place_dict)
+    print('pred_food_dict ', pred_food_dict)
 
 
     '''
-    照片分析完成 進 類別推薦 模型 程式撰寫區
+    照片分析完成 進 mysql 拉 推薦景點 程式撰寫區
     '''
-
     place_recommend_list = place_recommend(pred_place_dict)
     food_recommend_list = food_recommend(pred_food_dict)
     print('place_recommend_list ', place_recommend_list)
